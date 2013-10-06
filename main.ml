@@ -50,7 +50,7 @@ let encrypt {env_prefix; chunk_size} ifile ofile =
   print_endline "You can decrypt it from within a Travis VM by:";
   Printf.printf "  travis-senv decrypt -p=%s\n\n" env_prefix
 
-let decrypt {env_prefix} file =
+let decrypt {env_prefix} =
   let getenv e =
     try Sys.getenv (prefix env_prefix e)
     with Not_found ->
@@ -82,14 +82,12 @@ let copts_t =
   Term.(pure copts $ env_prefix $ chunk_size)
 
 let decrypt_cmd =
-  let doc = "decrypt files" in 
-  let input_file = Arg.(required & pos ~rev:true 0 (some string) None
-                        & info [] ~docv:"INPUT FILE" ~doc) in
+  let doc = "decrypt files from the environment variables" in 
   let man = 
     [`S "DESCRIPTION";
      `P "Decrypt file and write it to standard output."]
   in    
-  Term.(pure decrypt $ copts_t $ input_file),
+  Term.(pure decrypt $ copts_t),
   Term.info "decrypt" ~sdocs:copts_sect ~doc ~man
 
 let encrypt_cmd =
