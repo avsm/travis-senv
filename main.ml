@@ -1,5 +1,7 @@
 open Cmdliner
 
+let default_env_prefix = "default"
+let default_chunk_size = 80
 type copts = { env_prefix : string; chunk_size : int }
 
 let copts_sect = "COMMON OPTIONS"
@@ -63,8 +65,8 @@ let decrypt {env_prefix} file =
   print_string (Base64.decode (Buffer.contents buf))
 
 let copts env_prefix chunk_size =
-  let env_prefix = match env_prefix with None -> "default" | Some p -> p in
-  let chunk_size = match chunk_size with None -> 100 | Some c -> c in
+  let env_prefix = match env_prefix with None -> default_env_prefix | Some p -> p in
+  let chunk_size = match chunk_size with None -> default_chunk_size | Some c -> c in
   { env_prefix; chunk_size }
 
 let copts_t = 
@@ -85,7 +87,7 @@ let decrypt_cmd =
                         & info [] ~docv:"INPUT FILE" ~doc) in
   let man = 
     [`S "DESCRIPTION";
-     `P "Decrypt"]
+     `P "Decrypt file and write it to standard output."]
   in    
   Term.(pure decrypt $ copts_t $ input_file),
   Term.info "decrypt" ~sdocs:copts_sect ~doc ~man
