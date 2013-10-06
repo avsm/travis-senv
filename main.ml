@@ -21,7 +21,6 @@ let chunk_file file size =
   let b64 = Base64.encode (Buffer.contents buf) in
   (* Chunk this string into [size] chunks to convert into env vars *)
   let chunks = (String.length b64 / size) + 1 in
-  Printf.eprintf "chunks %d size %d  tlen %d\n%!" chunks size (String.length b64);
   Array.init chunks 
     (fun i ->
        let off = i * size in
@@ -29,7 +28,6 @@ let chunk_file file size =
          if off + size > (String.length b64) then
            (String.length b64) - off
          else size in
-       Printf.eprintf "%d %d %d total %d\n" i off len (String.length b64);
        String.sub b64 off len)
 
 let encrypt {env_prefix; chunk_size} ifile ofile =
@@ -46,8 +44,8 @@ let encrypt {env_prefix; chunk_size} ifile ofile =
   close_out fout;
   ignore(Sys.command (Printf.sprintf "cat %s" ofile));
   print_endline "Now run this to add it to your travis.yml:";
-  Printf.printf "  cat %s | travis-senv encrypt -ps --add\n\n%!" ofile;
-  print_endline "You can decrypt it from within Travis by:";
+  Printf.printf "  cat %s | travis encrypt -ps --add\n\n%!" ofile;
+  print_endline "You can decrypt it from within a Travis VM by:";
   Printf.printf "  travis-senv decrypt -p=%s\n\n" env_prefix
 
 let decrypt {env_prefix} file =
